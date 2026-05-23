@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>网络安全伴我行 — 知识问卷</title>
+  <style>
+    :root {
+      --accent: #7bd389;
+      --accent-2: #6fb3ff;
+      --card-bg: rgba(255, 255, 255, 0.85);
+      --glass: rgba(255, 255, 255, 0.85);
+      --text: #04202b;
+      --muted: rgba(4, 32, 43, 0.65);
+      --bg-image: linear-gradient(135deg, #f6fbff 0%, #e6f2ff 100%);
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans SC", "Microsoft Yahei", Arial;
+      color: var(--text);
+      background: var(--bg-image);
+      background-attachment: fixed;
+    }
+
+    body {
+      background-image: var(--bg-image);
+      background-size: 200% 200%;
+      background-position: 0% 50%;
+      animation: bgShift 30s ease infinite;
+    }
+
+    @keyframes bgShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* subtle diagonal sheen */
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(120deg, rgba(255,255,255,0.06), rgba(255,255,255,0));
+      transform: translateX(-30%);
+      transition: transform 6s linear;
+    }
+    .card:hover::after { transform: translateX(30%); }
+
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .logo {
+      width: 64px;
+      height: 64px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      box-shadow: 0 6px 18px rgba(10, 10, 20, 0.6);
+      color: #04202b;
+    }
+
+    .h1 {
+      font-size: 20px;
+      margin: 0;
+      font-weight: 700;
+    }
+
+    .lead {
+      color: var(--muted);
+      margin: 6px 0 12px 0;
+      font-size: 13px;
+    }
+
+    /* Quiz Card */
+    .card {
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 6px 24px rgba(2, 6, 23, 0.06);
+      color: var(--text);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress {
+      height: 10px;
+      background: rgba(2,6,23,0.06);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+
+    .progress>i {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      transition: width 600ms cubic-bezier(.2, .9, .2, 1);
+    }
+
+    /* question */
+    .question {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 12px 0 18px;
+      min-height: 54px;
+    }
+
+    .options {
+      display: grid;
+      gap: 10px;
+    }
+
+    .option {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 12px 14px;
+      border: 1px solid rgba(2,6,23,0.06);
+      color: var(--text);
+      cursor: pointer;
+      transition: transform 240ms ease, box-shadow 240ms ease, background 240ms ease;
+      text-align: left;
+      box-shadow: 0 6px 18px rgba(12,20,30,0.04);
+    }
+
+    .option:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 24px rgba(12,20,30,0.06);
+    }
+
+    .option.correct {
+      background: linear-gradient(90deg, rgba(123,211,137,0.14), rgba(111,179,255,0.06));
+      border-color: rgba(123,211,137,0.25);
+    }
+
+    .option.wrong {
+      background: linear-gradient(90deg, rgba(255,113,113,0.08), rgba(255,80,80,0.03));
+      border-color: rgba(255,113,113,0.15);
+      opacity: 0.98;
+    }
+
+    /* explanation */
+    .explanation {
+      margin-top: 12px;
+      font-size: 14px;
+      color: var(--muted);
+      padding: 10px;
+      border-radius: 10px;
+      background: rgba(2,6,23,0.03);
+    }
+
+    /* controls */
+    .controls {
+      Display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .btn {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: #04202b;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 0 8px 18px rgba(10, 20, 30, 0.4);
+      transition: transform 160ms ease;
+    }
+
+    .btn:active {
+      transform: translateY(2px);
+    }
+
+    /* side panel */
+    .side {
+      position: sticky;
+      top: 24px;
+    }
+
+    .side .meta {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      color: var(--muted);
+      box-shadow: 0 6px 20px rgba(2, 6, 23, 0.5);
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* result modal */
+    .result {
+      display: none;
+      padding: 18px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+      text-align: center;
+    }
+
+    .result.show {
+      display: block;
+      animation: fadeIn .6s ease both;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    /* responsive */
+    @media (max-width:960px) {
+      .container {
+        grid-template-columns: 1fr;
+        padding: 14px;
+      }
+
+      .side {
+        position: relative;
+        top: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        transition: none !important;
+        animation: none !important;
+      }
+    }
+
+    /* small helper */
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <main>
+      <div class="header">
+        <div class="logo">IT</div>
+        <div>
+          <h2 class="h1">网络安全伴我行 — 知识测验</h2>
+          <div class="lead">作品提交与网络安全知识测验 — 保护隐私、提升素养。</div>
+        </div>
+      </div>
+
+      <section class="card" aria-labelledby="quiz-title">
+        <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100"><i id="progressBar"></i></div>
+
+        <div id="quizContent">
+          <div class="question" id="question">加载中...</div>
+          <div class="options" id="options"></div>
+
+          <div class="explanation" id="explanation" aria-live="polite" hidden></div>
+
+          <div class="controls">
+
+            <div>
+              <button id="nextBtn" class="btn" disabled>下一题</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="result" id="resultCard" role="status">
+          <h3 id="resultTitle">完成！</h3>
+          <p id="resultSummary"></p>
+          <div style="margin-top:12px">
+            <button id="reviewBtn" class="btn">查看解析</button>
+            <button id="restartBtn" class="btn" style="margin-left:8px">重做测验</button>
+          </div>
+          <p class="small" style="margin-top:10px">感谢参与，请保留作品与说明以便提交。</p>
+        </div>
+      </section>
+
+    </main>
+
+
+  </div>
+
+  <!-- Background music (local file) -->
+  <audio id="bgm" src="親愛なるあの日々へ.flac" preload="auto"></audio>
+
+  <script>
+    /* Background is a soft gradient defined in CSS :root. No dynamic image fetching. */
+
+
+
+    /* Background music playback with better compatibility for Edge/Chromium */
+    const audio = document.getElementById('bgm');
+    audio.loop = true;
+    audio.volume = 0.16;
+    audio.preload = 'auto';
+    let audioStarted = false;
+    // Try a muted autoplay to warm up decoding engines (may be allowed by browser)
+    (async ()=>{ try{ audio.muted = true; await audio.play().catch(()=>{}); audio.muted = true; }catch(e){} })();
+    // Check FLAC support
+    const flacSupported = !!(audio.canPlayType && (audio.canPlayType('audio/flac') || audio.canPlayType('audio/x-flac')));
+    function startAudioOnGesture(e){
+      if(audioStarted) return;
+      audioStarted = true;
+      // unmute and play (must be called from user gesture)
+      audio.muted = false;
+      audio.play().then(()=> {
+        // success
+        hideAudioBanner();
+      }).catch(err=>{
+        console.warn('Audio play failed:', err);
+        // show unobtrusive banner if playback failed or format unsupported
+        showAudioBanner();
+      });
+    }
+    ['pointerdown','keydown','touchstart'].forEach(ev => document.addEventListener(ev, startAudioOnGesture, {once:true, passive:true}));
+    // Audio fallback UI
+    function showAudioBanner(){
+      let b = document.getElementById('audioBanner');
+      if(b) { b.style.display = 'flex'; return; }
+      b = document.createElement('div');
+      b.id = 'audioBanner';
+      b.style.position = 'fixed';
+      b.style.left = '12px';
+      b.style.right = '12px';
+      b.style.bottom = '14px';
+      b.style.zIndex = '9999';
+      b.style.background = 'rgba(255,255,255,0.95)';
+      b.style.color = '#04202b';
+      b.style.borderRadius = '10px';
+      b.style.padding = '10px 14px';
+      b.style.boxShadow = '0 8px 24px rgba(2,6,23,0.08)';
+      b.style.display = 'flex';
+      b.style.gap = '10px';
+      b.style.alignItems = 'center';
+      b.innerHTML = `<div style="flex:1;font-size:13px">浏览器未能自动播放背景音乐。你的浏览器可能不支持 FLAC。<a id="downloadBgm" href="親愛なるあの日々へ.flac" style="margin-left:6px;color:#0b6ef6">下载播放</a></div><button id="tryAudioBtn" class="btn" style="background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#04202B;padding:8px 10px;border-radius:8px;border:none;cursor:pointer">尝试播放</button>` ;
+      document.body.appendChild(b);
+      document.getElementById('tryAudioBtn').addEventListener('click', ()=>{
+        audio.muted = false;
+        audio.play().then(()=>{ hideAudioBanner(); }).catch(()=>{ /* keep banner */});
+      });
+    }
+    function hideAudioBanner(){ const b=document.getElementById('audioBanner'); if(b) b.style.display='none'; }
+
+
+
+    /* Quiz data: 15题 */
+    const questions = [
+      { q: "信息茧房最可能带来的风险是：", options: ["算法不断推荐相似内容，限制视野和多样性", "设备被物理隔离", "网络带宽被占满", "信息泄密到外部机构"], a: 0, ex: "信息茧房指算法根据偏好推荐内容，造成回音室效应、认知偏见。" },
+      { q: "短视频刷屏导致的注意力问题常被称为：", options: ["流量劫持", "注意力剥夺", "信息加密", "社交隔离"], a: 1, ex: "碎片化、频繁的推荐会剥夺持续注意力，形成注意力剥夺。" },
+      { q: "以下哪项是识别钓鱼邮件（诈骗邮件）的常见特征？", options: ["邮件来自你常用联系人", "邮件长度很长", "要求紧急操作并包含陌生链接或附件", "邮件只包含图片"], a: 2, ex: "钓鱼邮件常以紧急语气并包含可疑链接或附件，诱导输入敏感信息。" },
+      { q: "AI换脸诈骗主要的危险在于：", options: ["占用存储空间", "提高视频质量", "加速模型训练", "便于冒充熟人建立信任进行诈骗"], a: 3, ex: "换脸技术可用于冒充熟人或权威，增加诈骗可信度。" },
+      { q: "接到陌生来电自称银行工作人员，应首先：", options: ["挂断并用官网电话核实", "按对方要求提供验证码", "把卡号读给对方", "转账以验证身份"], a: 0, ex: "通过官方渠道核实来电，切勿在电话中直接提供验证码或转账。" },
+      { q: "下列哪项通常不属于敏感的个人隐私？", options: ["身份证号", "公开在社交平台的公开昵称", "银行账号", "户口本号码"], a: 1, ex: "公开昵称一般非敏感信息，但仍需注意其可能与真实身份关联。" },
+      { q: "遇到网络暴力时，合理的做法是：", options: ["与对方对骂", "删除所有社交账号", "保留证据并向平台举报或寻求帮助", "把对方信息公开曝光"], a: 2, ex: "保留证据并通过平台或法律渠道处理，避免扩大伤害。" },
+      { q: "智能助手可能带来的安全风险包括：", options: ["提高电池续航", "格式化硬盘", "自动修复系统错误", "数据泄露、被注入恶意指令、隐私滥用"], a: 3, ex: "智能助手收集的数据可能被滥用或外泄，也可能被注入恶意指令。" },
+      { q: "使用 AI 生成素材时的良好实践是：", options: ["标注 AI 生成来源并避免侵犯他人著作权/隐私", "声称由人工完成", "无需说明任何生成方式", "直接用他人作品训练模型并发布"], a: 0, ex: "透明标注并遵守版权与隐私规则是使用 AI 素材的良好实践。" },
+      { q: "设置密码时应避免的做法是：", options: ["使用长随机密码并启用二步验证", "在多个网站重复使用同一弱密码", "使用密码管理器", "定期更新不同密码"], a: 1, ex: "重复使用弱密码会显著增加被攻破的风险，应使用强密码和密码管理器。" },
+      { q: "如何有效抵御信息过载与注意力偷取？", options: ["不停刷短视频以获得信息", "随意点开所有链接", "设定使用时长限制，优先高质量信息源，关闭推送提醒", "取消所有社交账号"], a: 2, ex: "主动管理信息来源和使用习惯、关闭不必要推送可保护注意力。" },
+      { q: "当怀疑某条消息为AI伪造（深度伪造）时，最佳做法是：", options: ["马上转发以求证", "直接相信并行动", "忽视所有新闻", "保持怀疑并向权威渠道核实"], a: 3, ex: "核实来源并向可信媒体或官方渠道验证，谨慎传播。" },
+      { q: "收到可疑链接时，最佳处置方法是：", options: ["不要点击，先核实发送者并在安全环境中检查", "点击看看到底是什么", "回复发送者索要更多信息", "将链接转发给朋友"], a: 0, ex: "不直接点击链接，先确认发送者并在沙箱或隔离环境检查可以降低风险。" },
+      { q: "安装软件时应优先从哪里获取安装包？", options: ["第三方论坛下载链接", "官方渠道或可信应用商店", "不明来源的压缩包", "朋友分享的未经验证安装包"], a: 1, ex: "优先使用官方渠道或可信应用商店下载安装软件以降低恶意软件风险。" },
+      { q: "识别深度伪造（deepfake）内容时，最可靠的做法是：", options: ["相信视觉证据", "放大图像细节肉眼判断", "核实原始发布源并检查多方来源", "用社交媒体热度判断真伪"], a: 2, ex: "核实原始发布来源并交叉核对多方信息是识别伪造的可靠方法。" }
+    ];
+
+    /* State */
+    let idx = 0, score = 0;
+    const total = questions.length;
+
+    /* Elements */
+    const qEl = document.getElementById('question');
+    const optionsEl = document.getElementById('options');
+    const progBar = document.getElementById('progressBar');
+    const explanationEl = document.getElementById('explanation');
+    const nextBtn = document.getElementById('nextBtn');
+    const resultCard = document.getElementById('resultCard');
+    const resultTitle = document.getElementById('resultTitle');
+    const resultSummary = document.getElementById('resultSummary');
+    const reviewBtn = document.getElementById('reviewBtn');
+    const restartBtn = document.getElementById('restartBtn');
+
+    function renderQuestion(i) {
+      const item = questions[i];
+      qEl.textContent = `${i + 1}. ${item.q}`;
+      optionsEl.innerHTML = '';
+      explanationEl.hidden = true;
+      explanationEl.textContent = '';
+      nextBtn.disabled = true;
+      item.options.forEach((opt, j) => {
+        const btn = document.createElement('button');
+        btn.className = 'option';
+        btn.type = 'button';
+        btn.innerHTML = `<span>${String.fromCharCode(65 + j)}.</span> ${opt}`;
+        btn.dataset.index = j;
+        btn.addEventListener('click', onSelect);
+        optionsEl.appendChild(btn);
+        // stagger animation
+        btn.style.transitionDelay = (j * 60) + 'ms';
+      });
+      updateProgress(i);
+    }
+    function updateProgress(i) {
+      const pct = Math.round((i / total) * 100);
+      progBar.style.width = pct + '%';
+      progBar.parentElement.setAttribute('aria-valuenow', pct);
+    }
+
+    /* When user selects an option */
+    function onSelect(e) {
+      startAudioOnGesture(); // ensure audio starts on direct answer
+      const selected = parseInt(e.currentTarget.dataset.index, 10);
+      const q = questions[idx];
+      // disable further clicks
+      [...optionsEl.children].forEach(btn => btn.removeEventListener('click', onSelect));
+      // mark selected
+      const correctIndex = q.a;
+      if (selected === correctIndex) {
+        e.currentTarget.classList.add('correct');
+        score += 1;
+      } else {
+        e.currentTarget.classList.add('wrong');
+        // show correct
+        const correctBtn = [...optionsEl.children].find(b => parseInt(b.dataset.index, 10) === correctIndex);
+        if (correctBtn) correctBtn.classList.add('correct');
+      }
+      explanationEl.hidden = false;
+      explanationEl.textContent = q.ex;
+      nextBtn.disabled = false;
+      // small animation
+      optionsEl.animate([{ opacity: 0.96 }, { opacity: 1 }], { duration: 420, fill: 'forwards' });
+    }
+
+    /* next question */
+    nextBtn.addEventListener('click', () => {
+      idx++;
+      if (idx < total) {
+        renderQuestion(idx);
+      } else {
+        finish();
+      }
+    });
+
+function finish(){
+      document.getElementById('quizContent').style.display = 'none';
+      resultCard.classList.add('show');
+      resultCard.style.display = 'block';
+      resultTitle.textContent = '测验完成';
+      const pct = Math.round(score / total * 100);
+      resultSummary.innerHTML = `
+        <div>得分：<strong>${score}</strong> / ${total} &nbsp; 正确率：${pct}%</div>
+        <div style="text-align:left;margin-top:12px">
+          <h4 style="margin:8px 0;">知识总结</h4>
+          <ul style="line-height:1.6">
+            <li>核实信息来源，不随意点击陌生链接或转发可疑内容。</li>
+            <li>使用强密码并启用二步验证，避免在多个网站重复使用相同密码。</li>
+            <li>从官方渠道或可信应用商店下载安装软件，避免不明来源安装包。</li>
+            <li>使用 AI 时标注来源并尊重版权与隐私，谨慎共享敏感内容。</li>
+            <li>遇到网络暴力请保留证据并向平台或相关机构求助。</li>
+          </ul>
+          <p style="margin-top:10px;font-weight:600">感谢你了解网络安全知识，祝你每天开心！</p>
+        </div>
+      `;
+    }
+
+    /* review */
+    reviewBtn.addEventListener('click', () => {
+      resultCard.classList.remove('show');
+      document.getElementById('quizContent').style.display = 'block';
+      // show explanations sequentially
+      idx = 0;
+      score = 0;
+      showAllExplanations();
+    });
+
+function showAllExplanations(){
+
+      // render each question and explanation, disable interaction
+      qEl.textContent = '';
+      optionsEl.innerHTML = '';
+      explanationEl.hidden = false;
+      let i = 0;
+      const container = document.getElementById('quizContent');
+      container.scrollIntoView({ behavior: 'smooth' });
+      function step() {
+        if (i >= total) {
+          return;
+        }
+        const it = questions[i];
+        qEl.textContent = `${i + 1}. ${it.q}`;
+        optionsEl.innerHTML = '';
+        it.options.forEach((o, j) => {
+          const b = document.createElement('div');
+          b.className = 'option' + (j === it.a ? ' correct' : '');
+          b.innerHTML = `<span>${String.fromCharCode(65 + j)}.</span> ${o}`;
+          optionsEl.appendChild(b);
+        });
+        explanationEl.textContent = it.ex;
+        i++;
+        setTimeout(step, 1200);
+      }
+      step();
+    }
+
+    /* restart */
+    restartBtn.addEventListener('click', () => {
+      idx = 0; score = 0;
+      resultCard.classList.remove('show');
+      document.getElementById('quizContent').style.display = 'block';
+      renderQuestion(0);
+    });
+
+    /* initialize */
+    renderQuestion(0);
+
+    /* Accessibility: keyboard navigation */
+    optionsEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        const target = e.target;
+        if (target && target.classList.contains('option')) {
+          target.click();
+        }
+      }
+    });
+
+    /* Small improvement: animate progress to 100% on finish */
+    function setProgressTo(n) {
+      progBar.style.width = n + '%';
+    }
+    window.addEventListener('load', () => { progBar.style.width = '0%'; setTimeout(() => updateProgress(idx), 80); });
+
+  </script>
+</body>
+
+</html>
